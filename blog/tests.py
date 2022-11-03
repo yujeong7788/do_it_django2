@@ -8,6 +8,23 @@ class TestView(TestCase):
     def setUp(self): # 베이스 만드는곳임
         self.client = Client()
         
+    def navbar_test(self,soup): # 함수 바깥에서 soup 받기
+        navbar = soup.nav
+        self.assertIn('Blog',navbar.text)
+        self.assertIn('About Me',navbar.text)
+        
+        logo_btn = navbar.find('a',text='Do It Django')
+        self.assertEqual(logo_btn.attrs['href'],'/') # attr : 속성 href라는 속성찾기, 속성여러개라 키값으로 찾기
+        
+        home_btn = navbar.find('a',text='Home')
+        self.assertEqual(home_btn.attrs['href'],'/')
+        
+        blog_btn = navbar.find('a',text='Blog')
+        self.assertEqual(blog_btn.attrs['href'],'/blog/')
+        
+        about_me_btn = navbar.find('a',text='About Me')
+        self.assertEqual(about_me_btn.attrs['href'],'/about_me/')
+        
     def test_post_list(self):
         # 1.1 포스트 목록 페이지를 가져온다.
         response = self.client.get('/blog/')
@@ -19,12 +36,13 @@ class TestView(TestCase):
         soup = BeautifulSoup(response.content,'html.parser') #받은 소스코드 넘어감
         self.assertEqual(soup.title.text,'Blog')
        
-        # 1.4 네비게이션 바가 있다.
-        navbar = soup.nav # nav 태그 다 가져옴
+        # # 1.4 네비게이션 바가 있다.
+        # navbar = soup.nav # nav 태그 다 가져옴
         
-        # 1.5 Blog, Abou me 라는 문구가 네비게이션 바에 있다.
-        self.assertIn('Blog',navbar.text) # 나브 태그 안에 블로그가 있냐
-        self.assertIn('About Me',navbar.text)
+        # # 1.5 Blog, Abou me 라는 문구가 네비게이션 바에 있다.
+        # self.assertIn('Blog',navbar.text) # 나브 태그 안에 블로그가 있냐
+        # self.assertIn('About Me',navbar.text)
+        self.navbar_test(soup)
         
         # 2.1 메인 영역에 게시물이 하나도 없다면
         #self.assertEqual(Post.objects.count,0) #  포스트 개체의 오브젝트 갯수 0개
@@ -74,10 +92,11 @@ class TestView(TestCase):
         self.assertEqual(response.status_code,200)
         soup = BeautifulSoup(response.content,'html.parser') # 구조화?  
         
-        # 2.2 포스트 목록 페이지와 똑같은 네비게이션 바가 있다.
-        navbar = soup.nav
-        self.assertIn('Blog',navbar.text)
-        self.assertIn('About Me',navbar.text)
+        # # 2.2 포스트 목록 페이지와 똑같은 네비게이션 바가 있다.
+        # navbar = soup.nav
+        # self.assertIn('Blog',navbar.text)
+        # self.assertIn('About Me',navbar.text)
+        self.navbar_test(soup)
         
         # 2.3 첫번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
         self.assertIn(post_001.title,soup.title.text)
@@ -85,7 +104,7 @@ class TestView(TestCase):
         # 2.4 첫번째 포스트의 제목이 포스트 영역에 있다.
         main_area = soup.find('div',id='main-area')
         post_area = main_area.find('div',id='post-area')
-        self.assertIn(post_001.title,post_area)
+        self.assertIn(post_001.title,post_area.text)
         
         # 2.5 첫번째 포스트의 작성자가 포스트 영역에있다(아직 구현x)
         
