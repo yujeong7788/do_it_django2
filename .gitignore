@@ -1,0 +1,5 @@
+db.sqlite3 
+# db.sqlite3 빼고 관리하겠다
+migrations/
+# 폴더명/ 
+_media/
