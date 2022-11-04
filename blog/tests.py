@@ -1,12 +1,15 @@
 from django.test import TestCase,Client
 from bs4 import BeautifulSoup
 from .models import Post # 현재경로의 모델의 포스트를 가져와라
+from django.contrib.auth.models import User
 
 # Create your tests here.
 
 class TestView(TestCase):
-    def setUp(self): # 베이스 만드는곳임
+    def setUp(self): # 베이스 만드는곳임, 기본 환경 셋팅
         self.client = Client()
+        self.user_trump = User.objects.create_user(username='trump',password='somepassword') # 계정생성
+        self.user_obama = User.objects.create_user(username='obama',password='somepassword')
         
     def navbar_test(self,soup): # 함수 바깥에서 soup 받기
         navbar = soup.nav
@@ -33,7 +36,7 @@ class TestView(TestCase):
         self.assertEqual(response.status_code,200) # 정상 200 비정상 404
         
         # 1.3 페이지 타이틀은 'Blog'이다.
-        soup = BeautifulSoup(response.content,'html.parser') #받은 소스코드 넘어감
+        soup = BeautifulSoup(response.content,'html.parser') #받은 소스코드 넘어감, 구조화
         self.assertEqual(soup.title.text,'Blog')
        
         # # 1.4 네비게이션 바가 있다.
@@ -49,16 +52,18 @@ class TestView(TestCase):
         
         # 2.2 '아직 게시물이 없습니다.'라는 문구가 보인다.
         main_area = soup.find('div',id='main-area')
-        self.assertIn('아직 게시물이 없습니다',main_area.text) # 마침표 찍지말것
+        self.assertIn('아직 게시물이 없습니다', main_area.text) # 마침표 찍지말것
         
         # 3.1 게시물이 2개 있다면
         post_001 = Post.objects.create(
             title='첫 번째 포스트 입니다.',
             content = 'Hello world. We are the World.',
+            author = self.user_trump
         )
         post_002 = Post.objects.create(
             title='두 번째 포스트 입니다.',
             content = '1등이 전부는 아니잖아요?',
+            author = self.user_obama
         )
         self.assertEqual(Post.objects.count(),2)
         
@@ -74,6 +79,9 @@ class TestView(TestCase):
         
         # 3.4 '아직 게시물이 없습니다.'라는 문구를 더 이상 보이지 않는다.
         self.assertNotIn('아직 게시물이 없습니다',main_area.text) # mainarea 텍스트값에 아직 게시물이 없습니다가 없으면 오케이
+        
+        self.assertIn(self.user_trump.username.upper(),main_area.text)
+        self.assertIn(self.user_obama.username.upper(),main_area.text)
 
     def test_post_detail(self):
         
@@ -81,6 +89,7 @@ class TestView(TestCase):
         post_001 = Post.objects.create(
             title='첫 번째 포스트 입니다.',
             content = 'Hello world. We are the World.',
+            author = self.user_trump
         )
                 
         # 1.2 그 포스트의 url은 '/blog/1'
@@ -107,6 +116,7 @@ class TestView(TestCase):
         self.assertIn(post_001.title,post_area.text)
         
         # 2.5 첫번째 포스트의 작성자가 포스트 영역에있다(아직 구현x)
+        self.assertIn(self.user_trump.username.upper(),post_area.text)
         
         # 2.6 첫번째 포스트의 내용이 포스트 영역에 있다.
         self.assertIn(post_001.content,post_area.text)

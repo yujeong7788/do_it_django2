@@ -13,7 +13,9 @@
         {%endif%} 
     <div class="card-body">
         <!--작성일자-->
-        <div class="small text-muted">{{p.create_at}}</div> 
+        <div class="small text-muted">{{p.create_at}} by
+            <a href="#">{{p.author | upper}}</a>
+        </div> 
         <!--제목-->
         <h2 class="card-title">{{p.title}}</h2>
         {%if p.hook_text%}
