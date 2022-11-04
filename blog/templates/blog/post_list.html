@@ -3,7 +3,7 @@
 <!-- Featured blog post-->
 {%if post_list.exists%}
 {%for p in post_list%}
-<div class="card mb-4">
+<div class="card mb-4" id="post-{{p.pk}}">
     <!-- 교재랑 다른 이미지 사용-->
     <a href="#!">
         {%if p.head_image%}
@@ -12,15 +12,22 @@
         <img class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/850/350" alt="..." /></a>
         {%endif%} 
     <div class="card-body">
+        {%if p.category%}
+        <div class="text-end"><span class="badge rounded-pill text-bg-secondary">{{p.category}}</span></div>
+        {%else%}
+        <div class="text-end"><span class="badge rounded-pill text-bg-secondary">미분류</span></div>
+        {%endif%}
         <!--작성일자-->
-        <div class="small text-muted">{{p.create_at}} by
-            <a href="#">{{p.author | upper}}</a>
-        </div> 
         <!--제목-->
         <h2 class="card-title">{{p.title}}</h2>
         {%if p.hook_text%}
         <h5 class="text-muted">{{p.hook_text}}</h5>
         {%endif%}
+        <div class="card-footer text-muted">
+            <div class="small text-muted">{{p.create_at}} by
+                <a href="#">{{p.author | upper}}</a>
+            </div> 
+          </div>
         <!--본문-->
         <p class="card-text">{{p.content|truncatewords:45}}</p>
         <!--글 세부항목-->

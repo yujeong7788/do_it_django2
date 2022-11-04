@@ -4,6 +4,17 @@ import os
 
 # Create your models here.
 
+class Category(models.Model):
+    name = models.CharField(max_length=50,unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # unique = True 똑같은 글자 허용 , 유니코드 허용
+    #slug 안되는 기호 알아서 자동으로 바꿔줌
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name_plural ="Categories"
+
 class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 상속받음. 
     title = models.CharField(max_length=30)# CharField() : 한 줄짜리 문자 필드, 최대 30
     # 모델이 어떻게 만들어져야 하는지를 부모로 부터 상속받음
@@ -27,7 +38,8 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
     # 모델의 필드 하나 수정, 하나 생성됨 -> migration 필요
 
     author = models.ForeignKey(User,null=True,on_delete=models.SET_NULL) # 테이블명만 적으면 유저에 있는 아이디 참조함,CASCADE : User 삭제하면 유저가 작성한 글도 같이 삭제됨, null은 삭제해ㅐ도 안없어짐
-    
+    category = models.ForeignKey(Category,null=True,on_delete=models.SET_NULL,blank=True) # 제거되면 널값으로 채우겠다 이게맞음..
+
     
     
     def __str__(self): # class 인자는 무조건 자기자신(self)?

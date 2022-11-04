@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 # 목록 중 글 하나를 보는 것은 DetailView, 수정은 UpdateView ... 클래스가 이미 정해져있음
-from .models import Post 
+from .models import Post,Category 
 # 현재 경로에 있는 models 안의 Post 임포트
 # Create your views here.
 
@@ -26,6 +26,14 @@ class PostList(ListView): # ListView에서 상속받음
     model = Post  # Post 모델 사용
     ordering='-pk'
     # template_name = "blog/index.html"
+    
+    def get_context_data(self,**kwargs): # 파라미터 * 변수명 : 리스트로 받음 , ** : 키 value로 받음 딕셔너리로받는다.
+        context = super(PostList,self).get_context_data() # super 부모 생성자에 자기 개체이름 넣고 부모의 get_context_data호출, 전체 데이터 호출
+        # == context['post_list']= Post.objects.all()
+        context['categories'] = Category.objects.all() #키 이름으로 바로 호출
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        return context
+        
 
     
     
