@@ -23,15 +23,15 @@
         {%if p.hook_text%}
         <h5 class="text-muted">{{p.hook_text}}</h5>
         {%endif%}
-        <div class="card-footer text-muted">
-            <div class="small text-muted">{{p.create_at}} by
-                <a href="#">{{p.author | upper}}</a>
-            </div> 
-          </div>
         <!--본문-->
         <p class="card-text">{{p.content|truncatewords:45}}</p>
         <!--글 세부항목-->
         <a class="btn btn-primary" href="{{p.get_absolute_url}}">Read more →</a>
+    </div>
+    <div class="card-footer text-muted">
+        <div class="small text-muted">{{p.create_at}} by
+            <a href="#">{{p.author | upper}}</a>
+        </div> 
     </div>
 </div>
 {%endfor%}
