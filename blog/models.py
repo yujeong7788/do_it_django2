@@ -26,7 +26,7 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
     # 수정되었을 때 현재시간으로 넣어줌
     # 모델의 필드 하나 수정, 하나 생성됨 -> migration 필요
 
-    author = models.ForeignKey(User,on_delete=models.CASCADE) # 테이블명만 적으면 유저에 있는 아이디 참조함,User 삭제하면 유저가 작성한 글도 같이 삭제됨
+    author = models.ForeignKey(User,null=True,on_delete=models.SET_NULL) # 테이블명만 적으면 유저에 있는 아이디 참조함,CASCADE : User 삭제하면 유저가 작성한 글도 같이 삭제됨, null은 삭제해ㅐ도 안없어짐
     
     
     
