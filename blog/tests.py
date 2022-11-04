@@ -14,7 +14,7 @@ class TestView(TestCase):
         self.assertIn('About Me',navbar.text)
         
         logo_btn = navbar.find('a',text='Do It Django')
-        self.assertEqual(logo_btn.attrs['href'],'/') # attr : 속성 href라는 속성찾기, 속성여러개라 키값으로 찾기
+        self.assertEqual(logo_btn.attrs['href'],'/') # attrs : 속성 href라는 속성찾기, 속성여러개라 키값으로 찾기
         
         home_btn = navbar.find('a',text='Home')
         self.assertEqual(home_btn.attrs['href'],'/')

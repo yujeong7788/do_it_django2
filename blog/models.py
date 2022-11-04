@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import os
 
 # Create your models here.
@@ -24,9 +25,13 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
     update_at = models.DateTimeField(auto_now=True)
     # 수정되었을 때 현재시간으로 넣어줌
     # 모델의 필드 하나 수정, 하나 생성됨 -> migration 필요
+
+    author = models.ForeignKey(User,on_delete=models.CASCADE) # 테이블명만 적으면 유저에 있는 아이디 참조함,User 삭제하면 유저가 작성한 글도 같이 삭제됨
+    
+    
     
     def __str__(self): # class 인자는 무조건 자기자신(self)?
-        return f'[{self.id}] {self.title}' # [글번호]
+        return f'[{self.id}] {self.title} :: {self.author}' # [글번호]
     # 함수 추가 -> migration 안 해도 됨
     
     def get_absolute_url(self):
