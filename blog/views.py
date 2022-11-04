@@ -50,5 +50,27 @@ class PostList(ListView): # ListView에서 상속받음
 
 class PostDetail(DetailView): # DetailView에서 상속받음
     model = Post  # Post 모델 사용
-    ordering='-pk'
-    # template_name = "blog/index.html"
+    def get_context_data(self,**kwargs): # 파라미터 * 변수명 : 리스트로 받음 , ** : 키 value로 받음 딕셔너리로받는다.
+        context = super(PostDetail,self).get_context_data() # super 부모 생성자에 자기 개체이름 넣고 부모의 get_context_data호출, 전체 데이터 호출
+        # == context['post_list']= Post.objects.all()
+        context['categories'] = Category.objects.all() #키 이름으로 바로 호출
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        return context
+    
+def category_page(request,slug):
+    if slug == 'no_category':
+        category = '미분류'
+        post_list = Post.objects.filter(category=None)
+    else:    
+        category = Category.objects.get(slug=slug) # url에서 받음
+        post_list = Post.objects.filter(category=category)
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list':post_list,
+            'categories':Category.objects.all(),
+            'no_category_post_count': Post.objects.filter(category=None).count(),
+            'category':category
+        }
+    )

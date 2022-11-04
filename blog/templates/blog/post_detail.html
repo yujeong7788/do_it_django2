@@ -10,6 +10,11 @@
 <article>
     <!-- Post header-->
     <header class="mb-4">
+        {%if post.category%}
+        <div class="text-end"><span class="badge rounded-pill text-bg-secondary">{{post.category}}</span></div>
+        {%else%}
+        <div class="text-end"><span class="badge rounded-pill text-bg-secondary">미분류</span></div>
+        {%endif%}
         <!-- 제목 Post title-->
         <h1 class="fw-bolder mb-1">{{post.title}}</h1> <!--모델명.title-->
         {%if post.hook_text%}
@@ -18,8 +23,11 @@
         <!-- 작성일자 Post meta content-->
         <div class="text-muted fst-italic mb-2">Posted on {{post.create_at}} by {{post.author|upper}}</div>
         <!-- Post categories-->
-        <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
-        <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
+        {%if post.category%}
+        <div class="text-start"><span class="badge rounded-pill text-bg-secondary">{{post.category}}</span></div>
+        {%else%}
+        <div class="text-start"><span class="badge rounded-pill text-bg-secondary">미분류</span></div>
+        {%endif%}
     </header>
     <!-- Preview image figure-->
     <figure class="mb-4">
