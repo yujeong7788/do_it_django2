@@ -4,5 +4,6 @@ from . import views  # url이랑(url.py) 실행할 함수(views.py)가 따로 �
 urlpatterns = [
     path('',views.PostList.as_view()),  # blog/views.py의 class를 호출
     path('<int:pk>/',views.PostDetail.as_view()),
-    path('category/<str:slug>/',views.category_page)
+    path('category/<str:slug>/',views.category_page),
+    path('tag/<str:slug>/',views.tag_page),
 ]

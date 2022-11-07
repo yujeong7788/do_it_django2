@@ -5,7 +5,7 @@ from .models import Post, Category, Tag
 
 # Create your tests here.
 class TestView(TestCase):
-    def setUp(self): # 기본 셋팅
+    def setUp(self):
         self.client = Client()
         
         self.user_trump = User.objects.create_user(username='trump',password='somepassword')
@@ -14,7 +14,6 @@ class TestView(TestCase):
         self.category_programing = Category.objects.create(name='programing',slug='programing')
         self.category_music = Category.objects.create(name='music',slug='music')
 
-        # 태그 셋팅
         self.tag_python_kor = Tag.objects.create(name='파이썬 공부',slug='파이썬-공부')
         self.tag_python = Tag.objects.create(name='python',slug='python')
         self.tag_hello = Tag.objects.create(name='hello',slug='hello')
@@ -25,7 +24,7 @@ class TestView(TestCase):
             category = self.category_programing,
             author = self.user_trump
         )
-        self.post_001.tags.add(self.tag_hello) # 뒤에 추가하는 방식으로 태그
+        self.post_001.tags.add(self.tag_hello)
 
         self.post_002 = Post.objects.create(
             title = '두번째 포스트입니다.',
@@ -152,6 +151,22 @@ class TestView(TestCase):
 
         main_area =soup.find('div',id='main-area')
         self.assertIn(self.category_programing.name,main_area.text)
+        self.assertIn(self.post_001.title,main_area.text)
+        self.assertNotIn(self.post_002.title,main_area.text)
+        self.assertNotIn(self.post_003.title,main_area.text)
+
+    def test_tag_page(self):
+        response = self.client.get(self.tag_hello.get_absolute_url())
+        self.assertEqual(response.status_code,200)
+        soup = BeautifulSoup(response.content,'html.parser')
+
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+
+        self.assertIn(self.tag_hello.name, soup.h1.text)
+
+        main_area = soup.find('div',id='main-area')
+        self.assertIn(self.tag_hello.name,main_area.text)
         self.assertIn(self.post_001.title,main_area.text)
         self.assertNotIn(self.post_002.title,main_area.text)
         self.assertNotIn(self.post_003.title,main_area.text)

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 # 목록 중 글 하나를 보는 것은 DetailView, 수정은 UpdateView ... 클래스가 이미 정해져있음
-from .models import Post,Category 
+from .models import Post,Category,Tag
 # 현재 경로에 있는 models 안의 Post 임포트
 # Create your views here.
 
@@ -72,5 +72,20 @@ def category_page(request,slug):
             'categories':Category.objects.all(),
             'no_category_post_count': Post.objects.filter(category=None).count(),
             'category':category
+        }
+    )
+    
+def tag_page(request,slug):
+    tag = Tag.objects.get(slug=slug) # 하나가져올때 겟
+    post_list = tag.post_set.all()
+    
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list':post_list,
+            'tag' : tag,
+            'categories' : Category.objects.all(),
+            'no_category_post_count':Post.objects.filter(category=None).count(),
         }
     )
