@@ -1,7 +1,8 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.shortcuts import render,redirect
+from django.views.generic import ListView, DetailView, CreateView
 # 목록 중 글 하나를 보는 것은 DetailView, 수정은 UpdateView ... 클래스가 이미 정해져있음
 from .models import Post,Category,Tag
+from django.contrib.auth.mixins import LoginRequiredMixin
 # 현재 경로에 있는 models 안의 Post 임포트
 # Create your views here.
 
@@ -89,3 +90,16 @@ def tag_page(request,slug):
             'no_category_post_count':Post.objects.filter(category=None).count(),
         }
     )
+    
+class PostCreate(LoginRequiredMixin, CreateView):
+    model=Post
+    fields=['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
+    
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super(PostCreate,self).form_valid(form)
+        else:
+            return redirect('/blog/')
+    
