@@ -4,6 +4,19 @@ import os
 
 # Create your models here.
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # unique = True 똑같은 글자 허용 , 유니코드 허용
+    #slug 안되는 기호 알아서 자동으로 바꿔줌
+    
+    def __str__(self):
+        return self.name #이름값 나타나게
+    
+    def get_absolute_url(self):
+        return f'/blog/tag/{self.slug}/'
+    
+    
+
 class Category(models.Model):
     name = models.CharField(max_length=50,unique=True)
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # unique = True 똑같은 글자 허용 , 유니코드 허용
@@ -17,7 +30,7 @@ class Category(models.Model):
     
     
     class Meta:
-        verbose_name_plural ="Categories"
+        verbose_name_plural ="Categories" # s붙여주는역할
 
 class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 상속받음. 
     title = models.CharField(max_length=30)# CharField() : 한 줄짜리 문자 필드, 최대 30
@@ -43,6 +56,7 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
 
     author = models.ForeignKey(User,null=True,on_delete=models.SET_NULL) # 테이블명만 적으면 유저에 있는 아이디 참조함,CASCADE : User 삭제하면 유저가 작성한 글도 같이 삭제됨, null은 삭제해ㅐ도 안없어짐
     category = models.ForeignKey(Category,null=True,on_delete=models.SET_NULL,blank=True) # 제거되면 널값으로 채우겠다 이게맞음..
+    tags = models.ManyToManyField(Tag,blank=True) # 태그 모델에 있는 널값 트루 널 허용, 블랭크도 트루 비워두는거 가능
 
     
     
