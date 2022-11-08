@@ -4,6 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView,UpdateView
 from .models import Post,Category,Tag
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.utils.text import slugify
 # 현재 경로에 있는 models 안의 Post 임포트
 # Create your views here.
 
@@ -103,16 +104,41 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         current_user = self.request.user
         if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             form.instance.author = current_user # 로그인한 정보 넣어주는곳
-            return super(PostCreate,self).form_valid(form)
+            response = super(PostCreate,self).form_valid(form)
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                tags_str = tags_str.strip()
+                tags_str = tags_str.replace(',',';')
+                tags_list = tags_str.split(';')
+                for t in tags_list:
+                    t = t.strip()
+                    tag,is_tag_created = Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t,allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)
+            else:
+                return response
+                            
+            return response
         else:
             return redirect('/blog/')
     
     
 class PostUpdate(LoginRequiredMixin,UpdateView):
     model=Post
-    fields=['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags'] #수정하고자하는 항목
+    fields=['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category'] #수정하고자하는 항목
     
     template_name = 'blog/post_update_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate,self).get_context_data()
+        if self.object.tags.exists():# object 안에 가져온값 담겨져있음
+            tags_str_list = list()
+            for t in self.object.tags.all(): # 태그 전부 다 가져와서  t에 받아
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = ';'.join(tags_str_list)
+        return context
     
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author: # 로그인 됐는지 확인 and 요청한사람과 작성자 일치한지 화깅ㄴ
@@ -120,3 +146,20 @@ class PostUpdate(LoginRequiredMixin,UpdateView):
         else:
             raise PermissionDenied
     
+    def form_valid(self, form):
+        response = super(PostUpdate,self).form_valid(form)
+        self.object.tags.clear()
+        
+        tags_str = self.request.POST.get('tags_str')
+        if tags_str:
+                tags_str = tags_str.strip() # 공백제거
+                tags_str = tags_str.replace(',',';')
+                tags_list = tags_str.split(';')
+                for t in tags_list:
+                    t = t.strip()
+                    tag,is_tag_created = Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t,allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)
+        return response
