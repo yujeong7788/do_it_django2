@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView,UpdateView
 # 목록 중 글 하나를 보는 것은 DetailView, 수정은 UpdateView ... 클래스가 이미 정해져있음
 from .models import Post,Category,Tag
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 # 현재 경로에 있는 models 안의 Post 임포트
 # Create your views here.
 
@@ -61,10 +62,10 @@ class PostDetail(DetailView): # DetailView에서 상속받음
 def category_page(request,slug):
     if slug == 'no_category':
         category = '미분류'
-        post_list = Post.objects.filter(category=None)
+        post_list = Post.objects.filter(category=None).order_by('-pk')
     else:    
         category = Category.objects.get(slug=slug) # url에서 받음
-        post_list = Post.objects.filter(category=category)
+        post_list = Post.objects.filter(category=category).order_by('-pk')
     return render(
         request,
         'blog/post_list.html',
@@ -78,7 +79,7 @@ def category_page(request,slug):
     
 def tag_page(request,slug):
     tag = Tag.objects.get(slug=slug) # 하나가져올때 겟
-    post_list = tag.post_set.all()
+    post_list = tag.post_set.all().order_by('-pk')
     
     return render(
         request,
@@ -105,4 +106,17 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             return super(PostCreate,self).form_valid(form)
         else:
             return redirect('/blog/')
+    
+    
+class PostUpdate(LoginRequiredMixin,UpdateView):
+    model=Post
+    fields=['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags'] #수정하고자하는 항목
+    
+    template_name = 'blog/post_update_form.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author: # 로그인 됐는지 확인 and 요청한사람과 작성자 일치한지 화깅ㄴ
+            return super(PostUpdate,self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
     

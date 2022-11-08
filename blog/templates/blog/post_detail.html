@@ -10,6 +10,11 @@
 <article>
     <!-- Post header-->
     <header class="mb-4">
+        {%if user.is_authenticated and user == post.author%}
+        <div class="text-end">
+        <a role="button" href="/blog/update_post/{{post.pk}}/" class="btn btn-info btn-sm"><i class="fa-solid fa-pen-ruler"></i> Edit Post</a>
+        </div>
+        {%endif%}
         {%if post.category%}
         <div class="text-end"><span class="badge rounded-pill text-bg-secondary">{{post.category}}</span></div>
         {%else%}
