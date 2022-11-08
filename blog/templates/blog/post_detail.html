@@ -44,7 +44,7 @@
     </figure>
     <!-- 본문 Post content-->
     <section class="mb-5">
-        <p class="fs-5 mb-4">{{post.content}}</p>
+        <p class="fs-5 mb-4">{{post.get_content_markdown|safe}}</p>
         {%if post.tags.exists%}
         <div class="mb-3"> 
         <i class="fa-solid fa-tag"></i>

@@ -1,7 +1,11 @@
 from django.contrib import admin
 from .models import Post,Category,Tag  # . : 현재 경로 기준으로 # models.py 안에 Post라는 클래스 임포트
-# Register your models here.
-admin.site.register(Post)
+from markdownx.admin import MarkdownxModelAdmin
+
+
+
+admin.site.register(Post,MarkdownxModelAdmin)
+
 
 class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug':('name',)}
@@ -14,4 +18,6 @@ class TagAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug':('name',)}
     
 admin.site.register(Tag,TagAdmin)
+
+
     

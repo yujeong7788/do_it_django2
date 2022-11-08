@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 import os
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdown
 
 # Create your models here.
 
@@ -38,7 +40,7 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
     # pk는 알아서 만들어줌(우리가 지정 안해도 됨)
     # 데이터타입, 길이값, null/not-null
     hook_text = models.CharField(max_length=100,blank=True) # 짧은글, blank = True : null값 허용 , 비워도됨
-    content = models.TextField() # textarray?텍스트 어레이랑 연결됨(여러 줄짜리 문자 필드)
+    content = MarkdownxField() #models.TextField() # textarray?텍스트 어레이랑 연결됨(여러 줄짜리 문자 필드)
     
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/',blank=True)  
     # 이미지인지(ImageField), 일반 파일(FileField)인지에 따라서 달리 씀
@@ -73,3 +75,5 @@ class Post(models.Model): # Post라는 이름의 클래스는 modes의 Model을 
     def get_file_ext(self):
         return self.get_file_name().split('.')[-1] #보통은ㅇ 마지막ㅇ에 있는거 가져오는게 좋음
     
+    def get_content_markdown(self):
+        return markdown(self.content) # 마크다운처리

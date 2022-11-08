@@ -34,7 +34,7 @@
         <h5 class="text-muted">{{p.hook_text}}</h5>
         {%endif%}
         <!--본문-->
-        <p class="card-text">{{p.content|truncatewords:45}}</p>
+        <p class="card-text">{{p.get_content_markdown|truncatewords:45|safe}}</p>
         {%if p.tags.exists%}
         <div class="mb-3"> <!--줄간격 띄우기-->
         <i class="fa-solid fa-tag"></i>

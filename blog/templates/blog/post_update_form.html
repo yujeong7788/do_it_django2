@@ -1,4 +1,5 @@
 {%extends 'blog/base_full_width.html'%}
+{%load crispy_forms_tags%}
 {%block head_title%}
 Edit Post - Blog
 {%endblock%}
@@ -7,15 +8,16 @@ Edit Post - Blog
 <hr/>
 <form method="post" enctype="multipart/form-data">
     {%csrf_token%}
-    <table>
-        {{form}}
-        <tr>
-            <th><label for="id_tags_str">Tags:</label></th>
-            <td><input type="text" name="tags_str" id="id_tags_str" value="{{tags_str_default}}"></td>
-        </tr>
-    </table>
+    
+        {{form|crispy}}
+        <div class="div_id_tags_str">
+            <label for="id_tags_str">Tags:</label>
+            <input type="text" name="tags_str" id="id_tags_str" value="{{tags_str_default}}" class="textinput" form-control>
+        </div>
+    
     <div class="text-end mb-3">
     <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
+{{form.media}}
 {%endblock%}
